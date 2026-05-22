@@ -376,8 +376,8 @@ After=network.target
 
 [Service]
 User=ubuntu
-WorkingDirectory=/home/ubuntu/back
-ExecStart=/home/ubuntu/back/venv/bin/uvicorn app:app --host 0.0.0.0 --port 5000
+WorkingDirectory=/home/ubuntu/Employee_manegement/back
+ExecStart=/home/ubuntu/Employee_manegement/back/venv/bin/uvicorn app:app --host 0.0.0.0 --port 5000
 Restart=always
 
 [Install]
@@ -587,7 +587,7 @@ sudo apt install -y git
 Clone repository:
 
 ```bash
-wget https://github.com/USERNAME/REPO/archive/refs/heads/main.zip
+wget https://github.com/pranwagh11/Employee_manegement/archive/refs/heads/main.zip
 unzip main.zip
 ```
 
@@ -596,13 +596,13 @@ unzip main.zip
 # Verify Project Structure
 
 ```bash
-ls -R ~/employee-app
+ls -R ~/Employee_manegement
 ```
 
 Expected structure:
 
 ```text
-~/employee-app/
+~/Employee_manegement/
 ├── back/
 │   ├── app.py
 │   ├── controller.py
@@ -723,13 +723,13 @@ EXIT;
 Then run:
 
 ```bash
-mysql -u root -p < ~/employee-app/DBschema.sql
+mysql -u root -p < ~/Employee_manegement/DBschema.sql
 ```
 
 If your schema file is inside another folder:
 
 ```bash
-mysql -u root -p < ~/employee-app/back/DBschema.sql
+mysql -u root -p < ~/Employee_manegement/back/DBschema.sql
 ```
 
 Enter your MySQL password when prompted.
@@ -796,7 +796,7 @@ fully configured and ready for FastAPI backend integration.
 # Step 4.1 — Create `.env` File
 
 ```bash
-nano ~/employee-app/.env
+nano ~/Employee_manegement/.env
 ```
 
 Paste:
@@ -828,7 +828,7 @@ CTRL + X
 # Step 5.1 — Create Virtual Environment
 
 ```bash
-cd ~/employee-app/back
+cd ~/Employee_manegement/back
 
 python3 -m venv venv
 ```
@@ -903,7 +903,7 @@ sudo rm -rf /var/www/html/*
 ```
 
 ```bash
-sudo cp -r ~/employee-app/front/* /var/www/html/
+sudo cp -r ~/Employee_manegement/front/* /var/www/html/
 ```
 
 ---
@@ -982,9 +982,9 @@ After=network.target
 
 User=ubuntu
 
-WorkingDirectory=/home/ubuntu/employee-app/back
+WorkingDirectory=/home/ubuntu/Employee_manegement/back
 
-ExecStart=/home/ubuntu/employee-app/back/venv/bin/uvicorn app:app --host 0.0.0.0 --port 5000
+ExecStart=/home/ubuntu/Employee_manegement/back/venv/bin/uvicorn app:app --host 0.0.0.0 --port 5000
 
 Restart=always
 
