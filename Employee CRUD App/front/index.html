@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #3b82f6; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 2rem; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .form-group { margin-bottom: 1rem; display: flex; gap: 1rem; }
+        input { padding: 0.5rem; border-radius: 4px; border: 1px solid #475569; background: #334155; color: white; width: 100%; }
+        button { background: var(--accent); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500; }
+        table { width: 100%; border-collapse: collapse; background: var(--card); margin-top: 2rem; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #334155; }
+        th { background: #111827; }
+        .btn-danger { background: #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>👥 Team Directory Workspace</h2>
+        
+        <div class="form-group">
+            <input type="text" id="empName" placeholder="Full Name">
+            <input type="email" id="empEmail" placeholder="Email Address">
+            <input type="text" id="empPosition" placeholder="Position">
+            <input type="number" id="empSalary" placeholder="Salary">
+            <button onclick="addEmployee()">Add Employee</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th><th>Name</th><th>Email</th><th>Position</th><th>Salary</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="employeeTableBody">
+                <!-- Rows loaded programmatically via JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // The script automation automatically remaps this string target onto your EC2 IP
+        const API_URL = "http://127.0.0.1:5000/api/employees";
+
+        async function fetchEmployees() {
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                const tbody = document.getElementById('employeeTableBody');
+                tbody.innerHTML = '';
+                data.forEach(emp => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${emp.id}</td>
+                            <td>${emp.name}</td>
+                            <td>${emp.email}</td>
+                            <td>${emp.position}</td>
+                            <td>$${parseFloat(emp.salary).toLocaleString()}</td>
+                            <td><button class="btn-danger" onclick="deleteEmployee(${emp.id})">Delete</button></td>
+                        </tr>`;
+                });
+            } catch (err) { console.error("Error fetching records:", err); }
+        }
+
+        async function addEmployee() {
+            const payload = {
+                name: document.getElementById('empName').value,
+                email: document.getElementById('empEmail').value,
+                position: document.getElementById('empPosition').value,
+                salary: parseFloat(document.getElementById('empSalary').value)
+            };
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            fetchEmployees();
+        }
+
+        async function deleteEmployee(id) {
+            if(confirm("Remove this entry?")) {
+                await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                fetchEmployees();
+            }
+        }
+
+        // Initialize application table contents automatically on load
+        window.onload = fetchEmployees;
+    </script>
+</body>
+</html>
