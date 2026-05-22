@@ -480,68 +480,78 @@ sudo systemctl restart nginx
 
 # ✅ Final Production Architecture
 
+
+# 🚀 Production Deployment Tutorial
+
+This guide walks through deploying a modern decoupled full-stack application on an AWS EC2 Free Tier instance using:
+
+- **FastAPI** for backend API services
+- **Nginx** for frontend hosting and reverse proxy routing
+- **MySQL** with Stored Procedures for database operations
+- **Ubuntu Linux** cloud infrastructure on AWS EC2
+
+The system follows a production-style architecture where:
+
+- the frontend is served independently through Nginx,
+- the backend operates as a dedicated REST API service,
+- and the database layer is isolated through procedural SQL execution.
+
+This separation improves:
+
+- scalability
+- maintainability
+- security
+- resource optimization
+- deployment flexibility
+
+---
+
+# 🏗️ Phase 1 — Launch and Configure AWS EC2
+
+---
+
+# Step 1.1 — Create the EC2 Virtual Machine
+
+1. Sign in to the AWS Management Console.
+2. Open the **EC2 Dashboard**.
+3. Click:
+
 ```text
-                    INTERNET
-                        |
-                 HTTP / HTTPS
-                        |
-                    [ NGINX ]
-              Static + Reverse Proxy
-                        |
-              -------------------
-              |                 |
-      Frontend Assets       /api/*
-                                |
-                        [ FASTAPI ]
-                          Uvicorn
-                                |
-                          [ MySQL ]
-                      Stored Procedures
-
-#TUTORIAL
-
-# 🚀 Step-by-Step Production Deployment Tutorial
-
-This tutorial guides you through deploying a production-ready decoupled full-stack application using:
-
-- **FastAPI** backend
-- **Nginx** reverse proxy
-- **MySQL** database
-- **Stored Procedures**
-- **AWS EC2 Free Tier**
-
-The architecture separates frontend delivery from backend API processing for improved scalability, maintainability, and resource efficiency.
+Launch Instance
+```
 
 ---
 
-# 🏗️ Phase 1: Launch and Configure AWS EC2
+# Configure Instance Parameters
 
----
-
-# Step 1.1 — Launch EC2 Instance
-
-1. Log into AWS Console.
-2. Navigate to:
-   - **EC2 Dashboard**
-   - Click **Launch Instance**
-
----
-
-## Configure Instance
-
-| Setting | Value |
+| Configuration | Value |
 |---|---|
-| Name | `employee-management-server` |
-| AMI | Ubuntu LTS (Free Tier Eligible) |
+| Instance Name | `employee-management-server` |
+| Operating System | Ubuntu LTS (Free Tier Eligible) |
 | Instance Type | `t2.micro` or `t3.micro` |
-| Key Pair | Create/download `.pem` file |
+| Authentication | Create or select an existing Key Pair |
 
-Example key:
+---
+
+# Download SSH Key Pair
+
+AWS generates a secure `.pem` authentication key.
+
+Example:
+
 ```text
 my-key.pem
 ```
 
----
+Important:
+- Download it immediately
+- Store it securely
+- AWS cannot regenerate the same key later
+
+This file is required to remotely access your server using SSH.
+
+
+
 
 # Step 1.2 — Configure Security Group
 
@@ -617,14 +627,6 @@ Expected structure:
 ├── setup_frontend.sh
 └── .env
 ```
-
----
-
-# 🏗️ Phase 3: Install and Configure MySQL
-
----
-
-# 🏗️ Phase 3: Install and Initialize MySQL Database
 
 ---
 
