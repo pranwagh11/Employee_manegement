@@ -44,304 +44,18 @@ This separation improves:
 
 ---
 
-# 🌐 2. Frontend Layer
 
-## Frontend Workspace (`/front`)
-
-### Composition
-- Static `index.html`
-- Vanilla JavaScript
-- CSS styling
-
-### Delivery Engine
-Served directly through:
-
-- **Nginx**
-- Port `80`
-
-### Design Philosophy
-
-Static assets are handled entirely by Nginx instead of Python.
-
-Advantages:
-- lower memory consumption
-- reduced CPU usage
-- kernel-level file streaming
-- faster request throughput
-- avoids Python template rendering overhead
-
----
-
-# ⚙️ 3. Backend API Layer
-
-## Backend Workspace (`/back`)
-
-### Technology Stack
-- FastAPI
-- Uvicorn
-- Pydantic
-- Repository Pattern
-- Controller Layer
-
-### Execution Model
-
-The backend operates purely as a REST API engine.
-
-Responsibilities:
-- request validation
-- JSON serialization
-- business orchestration
-- database communication
-
-### Example API Endpoints
-
-```http
-GET    /api/employees
-POST   /api/employees
-PUT    /api/employees/{id}
-DELETE /api/employees/{id}
-```
-
----
-
-# 🧱 4. Repository & Controller Pattern
-
-The backend follows layered abstraction:
-
-```text
-Client Request
-      ↓
-FastAPI Route
-      ↓
-Controller Layer
-      ↓
-Repository Factory
-      ↓
-Database Procedure
-```
-
-Advantages:
-- clean separation of concerns
-- reusable business logic
-- simplified testing
-- database abstraction
-- easier future migrations
-
----
-
-# 🗄️ 5. Database Procedural Isolation
-
-All transactional logic is centralized inside a MySQL Stored Procedure:
-
-```sql
-CALL ManageEmployee(...)
-```
-
-## Procedure Operation Matrix
-
-| Flag | Operation | Behavior |
-|------|-----------|-----------|
-| 1 | READ | Returns all employees |
-| 2 | CREATE | Inserts new employee |
-| 3 | UPDATE | Updates employee |
-| 4 | DELETE | Removes employee |
-
----
-
-## Example Stored Procedure
-
-```sql
-DELIMITER $$
-
-CREATE PROCEDURE ManageEmployee(
-    IN p_flag INT,
-    IN p_id INT,
-    IN p_name VARCHAR(100),
-    IN p_email VARCHAR(100),
-    IN p_position VARCHAR(100),
-    IN p_salary DECIMAL(10,2)
-)
-BEGIN
-
-    IF p_flag = 1 THEN
-
-        SELECT * FROM employees;
-
-    ELSEIF p_flag = 2 THEN
-
-        INSERT INTO employees(name,email,position,salary)
-        VALUES(p_name,p_email,p_position,p_salary);
-
-    ELSEIF p_flag = 3 THEN
-
-        UPDATE employees
-        SET
-            name = p_name,
-            email = p_email,
-            position = p_position,
-            salary = p_salary
-        WHERE id = p_id;
-
-    ELSEIF p_flag = 4 THEN
-
-        DELETE FROM employees
-        WHERE id = p_id;
-
-    END IF;
-
-END$$
-
-DELIMITER ;
-```
-
----
-
-# 🔒 6. Database Security Advantages
-
-Using parameterized stored procedure calls provides:
-
-- reduced SQL exposure
-- centralized transaction logic
-- reusable execution plans
-- lower query parsing overhead
-- mitigation against SQL injection vectors
-
----
-
-# 📡 7. Network Routing & Binding
-
-## Public Interface Binding
-
-FastAPI/Uvicorn binds using:
-
-```python
-host="0.0.0.0"
-```
-
-Meaning:
-- listen on all network interfaces
-- accept external traffic
-- expose service publicly
-
----
-
-## Reverse Proxy Architecture
-
-Nginx handles:
-- public traffic
-- SSL termination
-- static file serving
-- reverse proxy forwarding
-
-### Nginx Flow
-
-```text
-Browser
-   ↓
-Nginx (:80 / :443)
-   ↓
-FastAPI (:5000 localhost only)
-```
-
-Advantages:
-- backend hidden from internet
-- improved security
-- centralized traffic management
-
----
-
-# 🔄 8. CORS Configuration
-
-Frontend and backend operate on different origins.
-
-Example:
-- Frontend → Port 80
-- API → Port 5000
-
-Therefore CORS must be enabled.
-
-## FastAPI Example
-
-```python
-from fastapi.middleware.cors import CORSMiddleware
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"]
-)
-```
-
----
-
-# ☁️ 9. AWS Free Tier Optimization
-
-## EC2 Resource Constraints
-
-AWS Free Tier instances:
-- t2.micro
-- t3.micro
-
-Provide:
-- 1GB RAM
-
-Optimization is essential.
-
----
-
-# 💾 10. Swap Memory Extension
-
-## Create 2GB Swap File
-
-```bash
-sudo fallocate -l 2G /swapfile
-sudo chmod 600 /swapfile
-sudo mkswap /swapfile
-sudo swapon /swapfile
-```
-
-## Persist Across Reboots
-
-```bash
-echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-```
-
-Advantages:
-- prevents OOM crashes
-- stabilizes MySQL
-- stabilizes API workers
-
----
-
-# 🛠️ 11. MySQL Low-Memory Optimization
-
-## Example Configuration
-
-```ini
-[mysqld]
-
-innodb_buffer_pool_size = 128M
-innodb_log_buffer_size = 8M
-max_connections = 20
-```
-
-Advantages:
-- reduced RAM pressure
-- stable operation on Free Tier
-
----
 
 # 🚀 12. Backend Service Deployment
 
 ## Install Dependencies
 
-```bash
+cd /Employee_manegement/back/
 python3 -m venv venv
 source venv/bin/activate
 
 pip install fastapi uvicorn pymysql python-dotenv
+pip install flask flask-cors python-dotenv mysql-connector-python
 ```
 
 ---
@@ -350,20 +64,10 @@ pip install fastapi uvicorn pymysql python-dotenv
 
 ## Development
 
-```bash
-uvicorn app:app --host 0.0.0.0 --port 5000
+  python app.py
 ```
 
 ## Production
-
-```bash
-uvicorn app:app \
-  --host 0.0.0.0 \
-  --port 5000 \
-  --workers 1
-```
-
----
 
 # ⚡ 14. Systemd Service Automation
 
@@ -706,13 +410,6 @@ Your project already contains:
 DBschema.sql
 ```
 
-This file includes:
-- database creation
-- tables
-- stored procedures
-- initial schema logic
-
----
 
 ## Option A — Execute Directly From Linux Terminal (Recommended)
 
